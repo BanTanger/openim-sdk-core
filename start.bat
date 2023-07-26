@@ -1,2 +1,2 @@
 cd /d %~p0./testv3new
-go test -v -o pressure_test.test -run TestPressureTester_PressureSendMsgs -args -m=1000 -s=5338610321
+start ./pressure_test.exe -m 1000 -s register_test_4334,5338610321 -r 3167736657,5338610321 -g 3411007805 -t 1000 TestPressureTester_PressureSendMsgs
