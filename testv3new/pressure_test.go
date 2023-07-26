@@ -23,16 +23,16 @@ func (s *sliceValue) Set(val string) error {
 
 var (
 	messageNumber int
-	sendUserID    sliceValue
-	recvUserID    sliceValue
+	sendUserIDs   sliceValue
+	recvUserIDs   sliceValue
 	groupID       string
 	timeInterval  int64
 )
 
 func init() {
 	flag.IntVar(&messageNumber, "m", 0, "messageNumber for single sender")
-	flag.Var(&sendUserID, "s", "sender id list")
-	flag.Var(&recvUserID, "r", "recv id list")
+	flag.Var(&sendUserIDs, "s", "sender id list")
+	flag.Var(&sendUserIDs, "r", "recv id list")
 	flag.StringVar(&groupID, "g", "", "groupID for testing")
 	flag.Int64Var(&timeInterval, "t", 0, "timeInterVal during sending message")
 	flag.Parse()
@@ -43,58 +43,22 @@ func init() {
 }
 
 func TestPressureTester_PressureSendMsgs(t *testing.T) {
-	fmt.Println(messageNumber, sendUserID, recvUserID, groupID, timeInterval)
+	fmt.Println(messageNumber, sendUserIDs, recvUserIDs, groupID, timeInterval)
 	p := NewPressureTester(testcore.APIADDR, testcore.WSADDR)
 	for i := 0; i < 10; i++ {
-		p.WithTimer(p.PressureSendMsgs2)(sendUserID, recvUserID, messageNumber, time.Duration(timeInterval)*time.Millisecond)
+		p.WithTimer(p.PressureSendMsgs2)(sendUserIDs, recvUserIDs, messageNumber, time.Duration(timeInterval)*time.Millisecond)
 		time.Sleep(time.Second)
 	}
 	// time.Sleep(1000 * time.Second)
 }
 
 func TestPressureTester_PressureSendGroupMsgs(t *testing.T) {
-	pressureTester := NewPressureTester(testcore.APIADDR, testcore.WSADDR)
-	pressureSendGroupMsgsWithTime := pressureTester.WithTimer(pressureTester.PressureSendGroupMsgs)
-	pressureSendGroupMsgsWithTime([]string{sendUserID}, groupID, 100, time.Duration(100))
-}
-
-func TestPressureTester_PressureSendGroupMsgs2(t *testing.T) {
-	start := 1
-	count := 10000
-	step := 100
-	for j := start; j <= count; j += step {
-		var sendUserIDs []string
-		startTime := time.Now().UnixNano()
-		for i := j; i < j+step; i++ {
-			sendUserIDs = append(sendUserIDs, fmt.Sprintf("register_test_%v", i))
-		}
-		pressureTester := NewPressureTester(testcore.APIADDR, testcore.WSADDR)
-		pressureTester.PressureSendGroupMsgs(sendUserIDs, groupID, 1, 0)
-		endTime := time.Now().UnixNano()
-		nanoSeconds := float64(endTime - startTime)
-		t.Log("", nanoSeconds)
-		fmt.Println()
-	}
-}
-
-func TestPressureTester_Conversation(t *testing.T) {
-	sendUserID := "5338610321"
-	var recvUserIDs []string
-	for i := 1; i <= 1000; i++ {
-		recvUserIDs = append(recvUserIDs, fmt.Sprintf("register_test_%v", i))
-	}
 	p := NewPressureTester(testcore.APIADDR, testcore.WSADDR)
-	p.WithTimer(p.PressureSendMsgs)(sendUserID, recvUserIDs, 1, 100*time.Millisecond)
-}
-
-func TestPressureTester_PressureSendMsgs2(t *testing.T) {
-	recvUserID := "5338610321"
-	var sendUserIDs []string
-	for i := 1; i <= 1000; i++ {
-		sendUserIDs = append(sendUserIDs, fmt.Sprintf("register_test_%v", i))
+	for i := 0; i < 10; i++ {
+		p.WithTimer(p.PressureSendGroupMsgs)(sendUserIDs, groupID, messageNumber, time.Duration(timeInterval)*time.Millisecond)
+		time.Sleep(time.Second)
 	}
-	p := NewPressureTester(testcore.APIADDR, testcore.WSADDR)
-	p.WithTimer(p.PressureSendMsgs2)(sendUserIDs, []string{recvUserID}, 1, 100*time.Millisecond)
+	// time.Sleep(1000 * time.Second)
 }
 
 func Test_WithTimer(t *testing.T) {

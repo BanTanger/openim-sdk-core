@@ -189,7 +189,7 @@ func (p *PressureTester) PressureSendGroupMsgs(sendUserIDs []string, groupID str
 	p.InitSendCores(sendUserIDs)
 	endTime := time.Now().UnixNano()
 	fmt.Println("bantanger init send cores time:", float64(endTime-startTime))
-	// p.InitRecvCores([]string{groupID})
+
 	// 管理员邀请进群
 	err := p.InviteUserToGroup(groupID, sendUserIDs)
 	if err != nil {
