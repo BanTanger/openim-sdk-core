@@ -55,7 +55,7 @@ func TestPressureTester_PressureSendMsgs(t *testing.T) {
 func TestPressureTester_PressureSendGroupMsgs(t *testing.T) {
 	p := NewPressureTester(testcore.APIADDR, testcore.WSADDR)
 	for i := 0; i < 10; i++ {
-		p.WithTimer(p.PressureSendGroupMsgs)(sendUserIDs, groupID, messageNumber, time.Duration(timeInterval)*time.Millisecond)
+		p.WithTimer(p.PressureSendGroupMsgs2)(sendUserIDs, groupID, messageNumber, time.Duration(timeInterval)*time.Millisecond)
 		time.Sleep(time.Second)
 	}
 	// time.Sleep(1000 * time.Second)

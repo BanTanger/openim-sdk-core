@@ -208,6 +208,41 @@ func (p *PressureTester) PressureSendGroupMsgs(sendUserIDs []string, groupID str
 	}
 }
 
+// PressureSendGroupMsgs group chat send msg pressure test
+func (p *PressureTester) PressureSendGroupMsgs2(sendUserIDs []string, groupIDs []string, msgNum int, duration time.Duration) {
+	for _, groupID := range groupIDs {
+		if resp, err := p.GetGroupMembersInfo(groupID, sendUserIDs); err != nil {
+			log.ZError(context.Background(), "get group members info failed", err)
+			return
+		} else if resp.Members != nil {
+			log.ZError(context.Background(), "get group members info failed", err, "userIDs", sendUserIDs)
+			return
+		}
+
+		startTime := time.Now().UnixNano()
+		p.InitSendCores(sendUserIDs)
+		endTime := time.Now().UnixNano()
+		fmt.Println("bantanger init send cores time:", float64(endTime-startTime))
+
+		// 管理员邀请进群
+		err := p.InviteUserToGroup(groupID, sendUserIDs)
+		if err != nil {
+			return
+		}
+
+		for _, sendUserID := range sendUserIDs {
+			ctx, _ := InitContext(sendUserID)
+			sendCore := p.sendLightWeightSDKCores[sendUserID]
+			for i := 1; i <= msgNum; i++ {
+				time.Sleep(duration)
+				if err := sendCore.SendGroupMsg(ctx, groupID, i); err != nil {
+					log.ZError(ctx, "send msg error", err, "index", i, "recvUserID", groupID, "sendUserID", sendUserID)
+				}
+			}
+		}
+	}
+}
+
 // OrderingSendMsg msg ordering test
 func (p *PressureTester) OrderingSendMsg(groupID string, msgNum int) {
 
