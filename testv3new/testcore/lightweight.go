@@ -120,5 +120,6 @@ func (b *BaseCore) recvPushMsg() {
 func (b *BaseCore) defaultRecvPushMsgCallback(msg *sdkws.MsgData) {
 	if b.userID == msg.RecvID {
 		b.recvMap[msg.SendID+"_"+msg.RecvID]++
+		log.ZInfo(context.Background(), "success", "msg details", msg)
 	}
 }

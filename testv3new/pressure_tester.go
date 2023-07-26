@@ -47,6 +47,10 @@ func NewCtx(apiAddr, wsAddr, userID, token string) context.Context {
 		}})
 }
 
+func (p *PressureTester) add(a, b int) int {
+	return a + b
+}
+
 func (p *PressureTester) initCores(m *map[string]*testcore.BaseCore, userIDs []string) {
 	for _, userID := range userIDs {
 		token, err := p.registerManager.GetToken(userID)
@@ -119,7 +123,7 @@ func (p *PressureTester) PressureSendMsgs(sendUserID string, recvUserIDs []strin
 // PressureSendMsgs2 user single chat send msg pressure test
 func (p *PressureTester) PressureSendMsgs2(sendUserIDs []string, recvUserIDs []string, msgNum int, duration time.Duration) {
 	p.WithTimer(p.InitSendCores)(sendUserIDs)
-	// p.WithTimer(p.InitRecvCores)(recvUserIDs)
+	p.WithTimer(p.InitRecvCores)(recvUserIDs)
 
 	var wg sync.WaitGroup
 	msgChan := make(chan struct{})
@@ -142,9 +146,6 @@ func (p *PressureTester) PressureSendMsgs2(sendUserIDs []string, recvUserIDs []s
 					go func(i int) {
 						defer sendWG.Done()
 						p.WithTimer(sendCore.SendSingleMsg)(ctx, recvUserID, i)
-						// if err := sendCore.SendSingleMsg(ctx, recvUserID, i); err != nil {
-						// 	log.ZError(ctx, "send msg error", err, "index", i, "recvUserID", recvUserID, "sendUserID", sendUserID)
-						// }
 					}(i)
 				}
 				sendWG.Wait()
@@ -227,22 +228,52 @@ func (p *PressureTester) MsgReliabilityTest(sendUserID, recvUserID string, msgNu
 }
 
 // WithTimer Decorative function, accept a function as a parameter, and return a packaging function
-func (p *PressureTester) WithTimer(f interface{}) func(...interface{}) {
-	return func(args ...interface{}) {
+func (p *PressureTester) WithTimer(f interface{}) func(...interface{}) interface{} {
+	return func(args ...interface{}) interface{} {
 		start := time.Now().UnixNano()
 		v := reflect.ValueOf(f)
 		if v.Kind() != reflect.Func {
 			log.ZError(context.Background(), "pass parameter is not a function", nil,
 				"actual parameter", v.Kind(), "expected parameter", reflect.Func)
-			return
+			return nil
 		}
 		funcName := runtime.FuncForPC(v.Pointer()).Name()
 		var in []reflect.Value
 		for _, arg := range args {
 			in = append(in, reflect.ValueOf(arg))
 		}
-		v.Call(in) // Execute the original function
+		call := v.Call(in) // Execute the original function
 		end := time.Now().UnixNano()
-		fmt.Printf("Execute Funcation: %s\nExecute Funcation spent time: %v\n", funcName, float64(end-start))
+		fmt.Printf("Execute Function: %s\nExecute Function spent time: %v\n", funcName, float64(end-start))
+
+		// Get and return the first return value from the original function
+		if len(call) > 0 {
+			return call[0].Interface()
+		}
+		return nil
+	}
+}
+
+// WithTimer Decorative function, accept a function as a parameter, and return a packaging function
+func WithTimer(f interface{}) func(...interface{}) []reflect.Value {
+	return func(args ...interface{}) []reflect.Value {
+		start := time.Now().UnixNano()
+		v := reflect.ValueOf(f)
+		if v.Kind() != reflect.Func {
+			log.ZError(context.Background(), "pass parameter is not a function", nil,
+				"actual parameter", v.Kind(), "expected parameter", reflect.Func)
+			return nil
+		}
+		funcName := runtime.FuncForPC(v.Pointer()).Name()
+		var in []reflect.Value
+		for _, arg := range args {
+			in = append(in, reflect.ValueOf(arg))
+		}
+		call := v.Call(in) // Execute the original function
+		end := time.Now().UnixNano()
+		fmt.Printf("Execute Function: %s\nExecute Function spent time: %v\n", funcName, float64(end-start))
+
+		// Return the call result directly
+		return call
 	}
 }
