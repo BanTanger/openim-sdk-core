@@ -26,12 +26,14 @@ require golang.org/x/net v0.11.0
 require (
 	github.com/OpenIMSDK/Open-IM-Server v0.0.0-20230712062720-2e6ea7b193c3
 	github.com/google/go-cmp v0.5.9
+	github.com/spf13/cobra v1.6.1
 )
 
 require (
 	github.com/bwmarrin/snowflake v0.3.0 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang/snappy v0.0.3 // indirect
+	github.com/inconshreveable/mousetrap v1.0.1 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/klauspost/compress v1.16.5 // indirect
@@ -40,6 +42,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.12 // indirect
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
 	github.com/shamsher31/goimgext v1.0.0 // indirect
+	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.0.2 // indirect
 	github.com/xdg-go/stringprep v1.0.2 // indirect

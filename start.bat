@@ -1,3 +1,2 @@
-cd /d %~p0
-cd ./single_test
-start msg_delay.exe -sn 3
+cd /d %~p0./testv3new
+go test -v -o pressure_test.test -run TestPressureTester_PressureSendMsgs -args -m=1000 -s=5338610321

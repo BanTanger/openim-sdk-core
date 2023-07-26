@@ -1,5 +1,8 @@
 package constant
 
 const (
-	TimeIntervalFlag = "timeInterval"
+	TimeIntervalFlag  = "timeInterval"
+	ReceiverFlag      = "receiver"
+	SenderFlag        = "sender"
+	MessageNumberFlag = "messageNumber"
 )

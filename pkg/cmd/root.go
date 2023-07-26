@@ -26,7 +26,38 @@ func (r *RootCmd) AddTimeIntervalFlag() {
 	r.Command.Flags().IntP(constant.TimeIntervalFlag, "t", 0, "interval time mill second")
 }
 
-func (r *RootCmd) getTimeIntervalFlag(cmd *cobra.Command) int {
+func (r *RootCmd) GetTimeIntervalFlag(cmd *cobra.Command) int {
 	port, _ := cmd.Flags().GetInt(constant.TimeIntervalFlag)
 	return port
+}
+
+func (r *RootCmd) AddReceiverFlag() {
+	r.Command.Flags().StringSliceP(constant.ReceiverFlag, "r", []string{}, "receiver id list")
+}
+
+func (r *RootCmd) GetAddReceiverFlag(cmd *cobra.Command) []string {
+	receivers, _ := cmd.Flags().GetStringSlice(constant.ReceiverFlag)
+	return receivers
+}
+
+func (r *RootCmd) AddSenderFlag() {
+	r.Command.Flags().StringSliceP(constant.SenderFlag, "s", []string{}, "sender id list")
+}
+
+func (r *RootCmd) GetSenderFlag(cmd *cobra.Command) []string {
+	senders, _ := cmd.Flags().GetStringSlice(constant.SenderFlag)
+	return senders
+}
+
+func (r *RootCmd) AddMessageNumberFlag() {
+	r.Command.Flags().IntP(constant.MessageNumberFlag, "m", 0, "single sender send message Number")
+}
+
+func (r *RootCmd) GetMessageNumberFlag(cmd *cobra.Command) int {
+	senders, _ := cmd.Flags().GetInt(constant.MessageNumberFlag)
+	return senders
+}
+
+func (r *RootCmd) Execute() error {
+	return r.Command.Execute()
 }

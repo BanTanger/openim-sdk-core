@@ -3,12 +3,22 @@ package testv3new
 import (
 	"fmt"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
+	"open_im_sdk/pkg/cmd"
 	"open_im_sdk/testv3new/testcore"
 	"testing"
 	"time"
 )
 
+var testCmd cmd.RootCmd
+
 func init() {
+	testCmd = cmd.NewRootCmd("pressure_test")
+	testCmd.AddSenderFlag()
+	testCmd.AddMessageNumberFlag()
+	err := testCmd.Execute()
+	if err != nil {
+		panic(err)
+	}
 	if err := log.InitFromConfig("sdk.log", "sdk", 3,
 		true, false, "", 2); err != nil {
 		panic(err)
@@ -16,9 +26,10 @@ func init() {
 }
 
 func TestPressureTester_PressureSendMsgs(t *testing.T) {
-	sendUserID := []string{"register_test_493"}
+	sendUserID := testCmd.GetSenderFlag(&testCmd.Command)
 	recvUserID := []string{"5338610321"}
-
+	messageNumber := testCmd.GetMessageNumberFlag(&testCmd.Command)
+	fmt.Println(messageNumber)
 	p := NewPressureTester(testcore.APIADDR, testcore.WSADDR)
 	for i := 0; i < 10; i++ {
 		p.WithTimer(p.PressureSendMsgs2)(sendUserID, recvUserID, 1000, 100*time.Millisecond)
